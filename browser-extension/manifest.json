@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "ASTRA Browser Bridge",
+  "version": "1.0.0",
+  "description": "Connects Chrome to the ASTRA desktop AI companion: page understanding, actions and the AI cursor.",
+  "permissions": ["nativeMessaging", "tabs", "scripting", "storage", "alarms"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "ASTRA Browser Bridge"
+  },
+  "icons": {
+    "128": "icon.png"
+  }
+}

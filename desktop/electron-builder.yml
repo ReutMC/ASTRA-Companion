@@ -1,0 +1,36 @@
+appId: app.astra.companion
+productName: ASTRA
+copyright: Copyright © 2024 ASTRA (MIT)
+
+directories:
+  output: dist-installer
+
+files:
+  - dist/**
+
+extraResources:
+  - from: ../frontend/dist
+    to: ui
+  - from: ../browser-extension
+    to: extension
+  - from: ../native-host
+    to: native-host
+  - from: ../agent/dist
+    to: agent
+
+asar: true
+
+win:
+  target: nsis
+  icon: ../assets/icons/astra.png
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  artifactName: ASTRA-Setup.exe
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: ASTRA
+  include: ../installer/installer.nsh
+  deleteAppDataOnUninstall: false

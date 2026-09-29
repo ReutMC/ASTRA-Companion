@@ -1,0 +1,28 @@
+{
+  "name": "astra-desktop",
+  "productName": "ASTRA",
+  "version": "1.0.0",
+  "description": "ASTRA - a futuristic astronaut AI companion living on your Windows desktop. Four modes, animated astronaut, agentic research, Chrome control, Persian voice.",
+  "main": "dist-electron/main/main.js",
+  "author": "ASTRA Project",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "npm run build && electron .",
+    "start": "electron .",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "assets": "node scripts/make-icon.js",
+    "installer": "npm run build && electron-builder --win nsis",
+    "dist:dir": "npm run build && electron-builder --win nsis --dir"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "electron": "^31.3.0",
+    "electron-builder": "^24.13.3",
+    "typescript": "^5.5.4"
+  }
+}

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; script-src 'self'" />
+  <title>ASTRA Console</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-theme="deep-space">
+  <header id="titlebar">
+    <div class="tb-left">
+      <span class="logo-dot"></span>
+      <span class="tb-title">ASTRA Console</span>
+    </div>
+    <div class="tb-right">
+      <button id="tb-min" class="tb-btn" title="Minimize" aria-label="Minimize window">&#x2500;</button>
+      <button id="tb-close" class="tb-btn tb-close" title="Hide" aria-label="Hide window">&#x2715;</button>
+    </div>
+  </header>
+
+  <div id="layout">
+    <nav id="side" aria-label="Main navigation">
+      <div id="mini-astro" aria-hidden="true"></div>
+      <button class="nav-btn active" data-view="chat" aria-label="Chat">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Chat</span>
+      </button>
+      <button class="nav-btn" data-view="research" aria-label="Research">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+        <span>Research</span>
+      </button>
+      <button class="nav-btn" data-view="activity" aria-label="Activity">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        <span>Activity</span>
+      </button>
+      <button class="nav-btn" data-view="settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Settings</span>
+      </button>
+    </nav>
+
+    <main id="main">
+      <!-- CHAT -->
+      <section id="view-chat" class="view active" aria-label="Chat">
+        <div id="chat-scroll" class="scroll-area">
+          <div id="chat-messages"></div>
+        </div>
+        <div class="composer-bar">
+          <input id="chat-input" type="text" placeholder="Ask ASTRA anything... / از ASTRA هر چی بپرس..." dir="auto" autocomplete="off" />
+          <button id="chat-send" class="primary-btn">Send</button>
+          <button id="chat-stop" class="ghost-btn" title="Stop">Stop</button>
+        </div>
+      </section>
+
+      <!-- RESEARCH -->
+      <section id="view-research" class="view" aria-label="Research">
+        <div class="research-head">
+          <input id="research-input" type="text" placeholder="Research topic... e.g. بهترین API های رایگان AI" dir="auto" />
+          <button id="research-run" class="primary-btn">Research</button>
+          <button id="research-save" class="ghost-btn" title="Save as Markdown to Documents/ASTRA/Research">Save .md</button>
+        </div>
+        <div id="research-scroll" class="scroll-area">
+          <div id="research-status" class="status-line">Ready. Results will appear here.</div>
+          <div id="research-steps" class="steps"></div>
+          <div class="panel-row">
+            <div class="panel">
+              <h3>Sources</h3>
+              <div id="research-sources" class="sources"></div>
+            </div>
+            <div class="panel">
+              <h3>Report</h3>
+              <div id="research-answer" class="answer" dir="auto"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ACTIVITY -->
+      <section id="view-activity" class="view" aria-label="Activity">
+        <div class="scroll-area">
+          <div id="activity-list"></div>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="view-settings" class="view" aria-label="Settings">
+        <div class="scroll-area">
+          <div id="settings-root"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script src="astronaut.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; script-src 'self'" />
+  <title>ASTRA</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-state="IDLE">
+  <div id="glow"></div>
+  <div id="drag-strip"></div>
+
+  <main id="stage">
+    <div id="chip" class="chip">
+      <span class="dot"></span>
+      <span id="chip-text">ASTRA &middot; IDLE</span>
+    </div>
+
+    <div id="astro" role="img" aria-label="ASTRA the astronaut companion"></div>
+
+    <div id="controls" class="hidden">
+      <div id="activity" class="activity" dir="auto"></div>
+      <div class="composer">
+        <button id="mic" class="icon-btn" title="Voice input (fa-IR / EN)" aria-label="Voice input">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="2" width="6" height="12" rx="3"></rect>
+            <path d="M5 10a7 7 0 0 0 14 0"></path>
+            <path d="M12 19v3"></path>
+          </svg>
+        </button>
+        <input id="input" type="text" placeholder="Ask ASTRA... / از ASTRA بپرس..." dir="auto" autocomplete="off" />
+        <button id="send" class="icon-btn send" title="Send" aria-label="Send">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14"></path>
+            <path d="M13 6l6 6-6 6"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="quick">
+        <button id="open-console" class="mini-btn">Console</button>
+        <button id="open-research" class="mini-btn">Research</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="astronaut.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

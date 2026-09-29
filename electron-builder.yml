@@ -1,0 +1,28 @@
+appId: com.astra.desktop
+productName: ASTRA
+copyright: Copyright (c) 2025 ASTRA Project
+
+directories:
+  output: dist
+  buildResources: build
+
+files:
+  - dist-electron/**/*
+  - src/renderer/**/*
+  - assets/**/*
+
+asar: true
+
+win:
+  target:
+    - nsis
+  icon: build/icon.ico
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: ASTRA
+  artifactName: ASTRA-Setup.${ext}

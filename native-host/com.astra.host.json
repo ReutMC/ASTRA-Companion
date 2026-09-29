@@ -1,0 +1,9 @@
+{
+  "name": "com.astra.host",
+  "description": "ASTRA Native Messaging Host",
+  "path": "{{HOST_PATH}}",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://{{EXTENSION_ID}}/"
+  ]
+}

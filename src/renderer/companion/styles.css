@@ -1,0 +1,325 @@
+/* ASTRA companion window - deep space glass UI */
+
+:root {
+  --bg: transparent;
+  --panel: rgba(10, 16, 34, 0.62);
+  --panel-border: rgba(125, 211, 252, 0.16);
+  --text: #e6f1ff;
+  --text-dim: #9fb3d1;
+  --accent: #67e8f9;
+  --accent-soft: rgba(103, 232, 249, 0.14);
+  --glow: #67e8f9;
+  --danger: #f87171;
+  --ok: #6ee7b7;
+}
+
+body[data-theme='obsidian'] {
+  --panel: rgba(14, 14, 18, 0.66);
+  --panel-border: rgba(203, 213, 225, 0.14);
+  --accent: #a5b4fc;
+  --glow: #a5b4fc;
+}
+
+body[data-theme='nebula'] {
+  --panel: rgba(23, 14, 40, 0.6);
+  --panel-border: rgba(196, 181, 253, 0.2);
+  --accent: #d8b4fe;
+  --glow: #c4b5fd;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  overflow: hidden;
+  font-family: 'Segoe UI', 'Vazirmatn', system-ui, -apple-system, sans-serif;
+  color: var(--text);
+  user-select: none;
+  --anim: 1;
+}
+
+/* Ambient glow behind the astronaut, tinted by state */
+#glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 36%, color-mix(in srgb, var(--glow) 22%, transparent), transparent 62%);
+  transition: background 0.6s ease;
+}
+
+/* State tint */
+body[data-state='LISTENING'] { --glow: #5eead4; }
+body[data-state='THINKING'] { --glow: #a78bfa; }
+body[data-state='SEARCHING'] { --glow: #38bdf8; }
+body[data-state='WORKING'] { --glow: #fbbf24; }
+body[data-state='SPEAKING'] { --glow: #67e8f9; }
+body[data-state='SUCCESS'] { --glow: #6ee7b7; }
+body[data-state='ERROR'] { --glow: #f87171; }
+body[data-state='SLEEPING'] { --glow: #475569; }
+
+/* Draggable top strip */
+#drag-strip {
+  position: fixed;
+  top: 0; left: 8%; right: 8%;
+  height: 26px;
+  -webkit-app-region: drag;
+}
+
+#stage {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 14px calc(14px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Status chip */
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  color: var(--text-dim);
+  transition: opacity 0.4s ease, border-color 0.4s ease;
+}
+.chip .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--glow);
+  box-shadow: 0 0 8px var(--glow);
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Astronaut container */
+#astro {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+#astro svg { width: min(78%, 240px); height: auto; overflow: visible; }
+
+/* Controls */
+#controls {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+#controls.hidden {
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+}
+
+.activity {
+  max-width: 92%;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 11px;
+  color: var(--text-dim);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.activity.show { opacity: 1; transform: none; }
+.activity.err { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 35%, transparent); }
+
+.composer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 6px 24px rgba(2, 8, 20, 0.35);
+}
+.composer:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: 0 0 0 3px var(--accent-soft), 0 6px 24px rgba(2, 8, 20, 0.35);
+}
+
+#input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 12.5px;
+  font-family: inherit;
+  padding: 6px 2px;
+}
+#input::placeholder { color: color-mix(in srgb, var(--text-dim) 70%, transparent); }
+
+.icon-btn {
+  width: 30px; height: 30px;
+  flex: 0 0 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--panel-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.icon-btn:hover { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 50%, transparent); transform: translateY(-1px); }
+.icon-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.icon-btn.send { background: var(--accent-soft); color: var(--accent); }
+.icon-btn.send:disabled { opacity: 0.4; cursor: default; }
+.icon-btn.rec {
+  color: #fff;
+  background: color-mix(in srgb, var(--danger) 75%, black);
+  border-color: var(--danger);
+  animation: recPulse 1.1s ease-in-out infinite;
+}
+@keyframes recPulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--danger) 45%, transparent); }
+  50% { box-shadow: 0 0 0 6px transparent; }
+}
+
+.quick { display: flex; gap: 6px; }
+.mini-btn {
+  padding: 4px 12px;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  color: var(--text-dim);
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.mini-btn:hover { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); transform: translateY(-1px); }
+.mini-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ============ ASTRONAUT ============ */
+
+.ast .ast-body {
+  animation: floaty calc(6s / max(var(--anim), 0.3)) ease-in-out infinite;
+  transform-origin: 120px 150px;
+}
+.ast.st-WORKING .ast-body { animation-duration: 1.2s; }
+.ast.st-SEARCHING .ast-body { animation-duration: 2.4s; }
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0) rotate(0.4deg); }
+  50% { transform: translateY(-8px) rotate(-0.6deg); }
+}
+
+/* Eyes: variants */
+.ast .eyes-happy, .ast .eyes-closed, .ast .eyes-error, .ast .zzz { opacity: 0; transition: opacity 0.25s ease; }
+.ast .grille rect { opacity: 0; }
+
+.ast .eyes-normal { transition: transform 0.35s ease; transform-box: fill-box; transform-origin: center; }
+.ast .eyeball { transform-box: fill-box; transform-origin: center; transition: transform 0.09s ease; }
+.ast.blink .eyeball { transform: scaleY(0.07); }
+
+.ast.st-SUCCESS .eyes-normal { opacity: 0; }
+.ast.st-SUCCESS .eyes-happy { opacity: 1; }
+
+.ast.st-SLEEPING .eyes-normal { opacity: 0; }
+.ast.st-SLEEPING .eyes-closed { opacity: 1; }
+.ast.st-SLEEPING .ast-body { filter: saturate(0.55) brightness(0.82); }
+.ast .zzz text { font-size: 15px; fill: #9fb3d1; font-weight: 700; opacity: 0; }
+.ast.st-SLEEPING .zzz { opacity: 1; }
+.ast.st-SLEEPING .zzz text { animation: zfloat 2.7s ease-in-out infinite; }
+.ast.st-SLEEPING .zzz text:nth-child(2) { animation-delay: 0.85s; }
+.ast.st-SLEEPING .zzz text:nth-child(3) { animation-delay: 1.7s; }
+@keyframes zfloat {
+  0% { opacity: 0; transform: translate(0, 0); }
+  30% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(9px, -17px); }
+}
+
+.ast.st-ERROR .eyes-normal { opacity: 0; }
+.ast.st-ERROR .eyes-error { opacity: 1; }
+.ast.st-ERROR .visor-group { animation: shake 0.4s ease-in-out 2; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+/* Listening: eyes pulse slightly */
+.ast.st-LISTENING .eyeball { animation: eyePulse 1s ease-in-out infinite; }
+@keyframes eyePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Searching: eyes scan left-right */
+.ast.st-SEARCHING .eyes-normal { animation: scan 1.5s ease-in-out infinite; }
+@keyframes scan {
+  0%, 100% { transform: translateX(-7px); }
+  50% { transform: translateX(7px); }
+}
+
+/* Thinking: rotating halo */
+.ast .halo { opacity: 0; transition: opacity 0.4s ease; transform-box: fill-box; transform-origin: center; }
+.ast.st-THINKING .halo { opacity: 1; animation: spin 7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Speaking: voice grille equalizer */
+.ast.st-SPEAKING .grille rect {
+  opacity: 1;
+  animation: eq 0.62s ease-in-out infinite alternate;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+.ast.st-SPEAKING .grille rect:nth-of-type(1) { animation-duration: 0.5s; }
+.ast.st-SPEAKING .grille rect:nth-of-type(2) { animation-duration: 0.72s; animation-delay: 0.08s; }
+.ast.st-SPEAKING .grille rect:nth-of-type(3) { animation-duration: 0.44s; animation-delay: 0.16s; }
+.ast.st-SPEAKING .grille rect:nth-of-type(4) { animation-duration: 0.68s; animation-delay: 0.04s; }
+.ast.st-SPEAKING .grille rect:nth-of-type(5) { animation-duration: 0.56s; animation-delay: 0.12s; }
+@keyframes eq {
+  from { transform: scaleY(0.3); }
+  to { transform: scaleY(1); }
+}
+
+/* Chest lights idle twinkle */
+.chest-lights circle { animation: twinkle 3.4s ease-in-out infinite; }
+.chest-lights circle:nth-child(2) { animation-delay: 1.1s; }
+.chest-lights circle:nth-child(3) { animation-delay: 2.2s; }
+@keyframes twinkle {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+/* Reduced motion respect */
+@media (prefers-reduced-motion: reduce) {
+  .ast .ast-body, .ast .halo, .ast .eyes-normal, .ast .eyeball { animation: none !important; }
+}

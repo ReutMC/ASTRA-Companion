@@ -1,0 +1,48 @@
+name: Build ASTRA Installer
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Windows Installer (NSIS)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check and compile
+        run: npm run build
+
+      - name: Build installer (dist/ASTRA-Setup.exe)
+        run: npm run installer
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifact (ASTRA-Setup.exe)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ASTRA-Setup
+          path: dist/ASTRA-Setup.exe
+          if-no-files-found: error
+
+      - name: Attach installer to GitHub Release (on tags)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/ASTRA-Setup.exe
